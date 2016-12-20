@@ -1,0 +1,6 @@
+.DS_Store
+/.build
+/Packages
+/*.xcodeproj
+.swift-console-controllers.hash
+.swift-console-controllers.output
