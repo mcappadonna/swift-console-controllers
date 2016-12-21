@@ -5,7 +5,7 @@ import Foundation
  *
  * Just a way to uniform different structs
  */
-protocol ConsoleViewControllerProtocol {
+public protocol ConsoleViewControllerProtocol {
     /*
      * execute()
      *
@@ -60,12 +60,12 @@ protocol ConsoleViewControllerProtocol {
  * nameVC.execute()
  *
  */
-struct ConsoleViewController <A>: ConsoleViewControllerProtocol {
+public struct ConsoleViewController <A>: ConsoleViewControllerProtocol {
     var text: String = ""
     var parse: (String) -> A? = { _ in return nil }
     var onComplete: (A) -> () = { _ in }
 }
-extension ConsoleViewController {
+public extension ConsoleViewController {
     // This function execute the viewControllers
     func execute () {
         print(text)
@@ -108,10 +108,10 @@ extension ConsoleViewController {
  *     navigationVC.pushViewController(nameVC, animated: true)
  *
  */
-struct ConsoleNavigationViewController: ConsoleViewControllerProtocol {
+public struct ConsoleNavigationViewController: ConsoleViewControllerProtocol {
     var viewController: ConsoleViewControllerProtocol
 }
-extension ConsoleNavigationViewController {
+public extension ConsoleNavigationViewController {
     mutating func pushViewController (_ vc: ConsoleViewControllerProtocol, animated: Bool) {
         if animated { sleep(2) }
         viewController = vc
@@ -159,10 +159,10 @@ extension ConsoleNavigationViewController {
  * let app = AppDelegate()
  *
  */
-struct AppDelegate {
+public struct AppDelegate {
     var initialViewController: ConsoleViewControllerProtocol?
 }
-extension AppDelegate {
+public extension AppDelegate {
     func run() {
         if let vc = initialViewController {
             vc.execute()
