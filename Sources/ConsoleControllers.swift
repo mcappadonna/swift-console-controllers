@@ -62,7 +62,7 @@ public protocol ConsoleViewControllerProtocol {
  */
 public struct ConsoleViewController <A>: ConsoleViewControllerProtocol {
     var text: String = ""
-    var parse: (String) -> A? = { _ in return nil }
+    var parse: (String) -> A?
     var onComplete: (A) -> () = { _ in }
 }
 public extension ConsoleViewController {
