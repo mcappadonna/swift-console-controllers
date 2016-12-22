@@ -21,7 +21,7 @@ public protocol ConsoleViewControllerProtocol {
  * It will require a text to display, a function to convert the input to an optional A
  * and a function that will be executed if the convertion succeeded.
  *
- * Parameters:
+ * Properties:
  *
  * - text: String         The text displayed when the ConsoleViewController will be executed
  * 
@@ -61,9 +61,9 @@ public protocol ConsoleViewControllerProtocol {
  *
  */
 public struct ConsoleViewController <A>: ConsoleViewControllerProtocol {
-    var text: String = ""
-    var parse: (String) -> A?
-    var onComplete: (A) -> () = { _ in }
+    let text: String = ""
+    let parse: (String) -> A?
+    let onComplete: (A) -> () = { _ in }
 }
 public extension ConsoleViewController {
     // This function execute the viewControllers
@@ -83,19 +83,37 @@ public extension ConsoleViewController {
  * as a variable, you have the pushViewController method which permit to execute some other ConsoleViewController
  * after the execution was done.
  *
- * Parameters:
+ * Properties:
  *
- * - viewController: ConsoleViewControllerProtocol
- *                        The ConsoleViewController that will be executed
+ * - title: String                 The title of the ConsoleNavigationViewController (default: "")
+ *
+ * - animationDuration: UInt32     The push/pop animation duration (default: 2 seconds)
+ *
+ * - viewControllers: [ConsoleViewControllerProtocol]
+ *                                 An array containing the stack of ConsoleViewController present into
+ *                                 the navigation
+ *
+ * - topViewController: ConsoleViewControllerProtocol?
+ *                                 Return (if present) the first element of the ConsoleViewController stack
+ *
+ * - visibleViewController: ConsoleViewControllerProtocol?
+ *                                 Return (if present) the last element of the ConsoleNavigationController stack.
+ *                                 This is the View Controller that will be executed during the
+ *                                 ConsoleNavigationViewController execution
  *
  * Methods:
  *
- * - execute()            Call the execute method of the current ConsoleViewControlled
+ * - execute()            Display, if available, the ConsoleNavigationViewController title and a separator, then
+ *                        call the execute method of the visible ConsoleViewControlled.
  *
  * - pushViewController(_:ConsoleViewControllerProtocol, animated:Bool)
- *                        This will replace the current ConsoleViewController and execute it. Setting
- *                        animated to true will introduce a 2 seconds delay (just to be aligned to the
- *                        UINavigationController.pushViewController method Parameters)
+ *                        This will add a new <ConsoleViewControllerProtocol> to the stack, then execute it.
+ *                        If animated was true, then wait before pushing it (see animationDuration property).
+ *
+ * - popViewController(animated: Bool)
+ *                        This will remove the last <ConsoleViewControllerProtocol> from the stack, then execute
+ *                        the previous one (if available).
+ *                        If animated was true, then wait before pushing it (see animationDuration property).
  *
  * Examples:
  *
@@ -109,27 +127,50 @@ public extension ConsoleViewController {
  *
  */
 public struct ConsoleNavigationViewController: ConsoleViewControllerProtocol {
-    var viewController: ConsoleViewControllerProtocol
+    var title: String = ""
+    var animationDuration: UInt32 = 2
+    var viewControllers: [ConsoleViewControllerProtocol] = []
+    var topViewController: ConsoleViewControllerProtocol? {
+        get {
+            return viewControllers.first
+        }
+    }
+    var visibleViewController: ConsoleViewControllerProtocol? {
+        get {
+            return viewControllers.last
+        }
+    }
 }
 public extension ConsoleNavigationViewController {
     mutating func pushViewController (_ vc: ConsoleViewControllerProtocol, animated: Bool) {
-        if animated { sleep(2) }
-        viewController = vc
+        if animated { sleep(animationDuration) }
+        viewControllers.append(vc)
+        execute()
+    }
+
+    mutating func popViewController (animated: Bool) {
+        if viewControllers.count == 0 { return }
+        if animated { sleep(animationDuration) }
+        viewControllers.dropLast()
         execute()
     }
 
     func execute () {
-        viewController.execute()
+        guard let visible = visibleViewController else { return }
+        if title != "" {
+            print(" \(title)\n---------------")
+        }
+        visible.execute()
     }
 }
 
 /*
  * AppDelegate
  *
- * A simple way to orchestrate multiple viewControllers execution. This will work either with
- * ConsoleViewController and ConsoleNavigationController
+ * A simple way to orchestrate multiple viewControllers execution. This will works with
+ * any struct which conforms to ConsoleViewControllerProtocol
  *
- * Parameters:
+ * Properties:
  *
  * - initialViewController: ConsoleViewControllerProtocol?
  *                        The controller that will be executed when the app will start.
@@ -154,7 +195,7 @@ public extension ConsoleNavigationViewController {
  * let ageVC = ConsoleViewController(text: "Enter your age:", parse: { return Int($0) }) { age in
  *     print("You're \(age) years old")
  * }
- * var navVC = ConsoleNavigationViewController(viewController: ageVC)
+ * var navVC = ConsoleNavigationViewController(viewControllers: [ageVC])
  *
  * let app = AppDelegate()
  *
