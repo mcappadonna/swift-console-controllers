@@ -61,9 +61,9 @@ public protocol ConsoleViewControllerProtocol {
  *
  */
 public struct ConsoleViewController <A>: ConsoleViewControllerProtocol {
-    let text: String = ""
+    let text: String
     let parse: (String) -> A?
-    let onComplete: (A) -> () = { _ in }
+    let onComplete: (A) -> ()
 }
 public extension ConsoleViewController {
     // This function execute the viewControllers
@@ -151,7 +151,7 @@ public extension ConsoleNavigationViewController {
     mutating func popViewController (animated: Bool) {
         if viewControllers.count == 0 { return }
         if animated { sleep(animationDuration) }
-        viewControllers.dropLast()
+        viewControllers.removeLast()
         execute()
     }
 
