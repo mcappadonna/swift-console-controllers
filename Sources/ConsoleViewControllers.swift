@@ -15,6 +15,15 @@ public protocol ConsoleViewControllerProtocol {
 }
 
 /*
+ * Here some usefull types:
+ *
+ *   Parser:     A function from String to a generic optional
+ *   Completer:  A function from an optional to nothing
+ */
+public typealias Parser <A> = (String) -> A?
+public typealias Completer <A> = (A) -> ()
+
+/*
  * ConsoleViewController
  *
  * This emulate an UIViewController in a terminal, and it was generic over type A.
@@ -62,8 +71,8 @@ public protocol ConsoleViewControllerProtocol {
  */
 public struct ConsoleViewController <A>: ConsoleViewControllerProtocol {
     let text: String
-    let parse: (String) -> A?
-    let onComplete: (A) -> ()
+    let parse: Parser<A>
+    let onComplete: Completer<A>
 }
 public extension ConsoleViewController {
     // This function execute the viewControllers
