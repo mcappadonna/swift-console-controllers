@@ -20,7 +20,7 @@ If you've already built with this version, and you need an update, simply run:
 
 To checkout the latest version available on the repository.
 
-## Bug (v1.0.2)
+## Bug (v1.0.4)
 Currently, a strange behaviour with Swift3 on Linux can happen. When you try to use the controllers, for example:
 
     import Foundation
